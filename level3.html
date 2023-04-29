@@ -387,7 +387,7 @@ color: red;
             }
     
     // finish level
-    if (levelFinishTicks > 2200) {
+    if (levelFinishTicks > 1800) {
     levelFinished = true
     document.getElementById("finishText1").style.visibility = "visible";
     handList.length = 0
@@ -425,7 +425,7 @@ color: red;
     }
     
     // add enemy loop
-    if (handChargerTicks > Math.floor(Math.random() * (400 - 275) + 275) && (levelFinished == false)) {
+    if (handChargerTicks > Math.floor(Math.random() * (325 - 225) + 225) && (levelFinished == false)) {
         handChargerTicks = 0
         addHand()
     }

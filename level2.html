@@ -349,7 +349,7 @@ if ((levelMusic.isPlaying() == false)) {
         }
 
 // finish level
-if (levelFinishTicks > 2300) {
+if (levelFinishTicks > 1900) {
 levelFinished = true
 document.getElementById("finishText").style.visibility = "visible";
 handList.length = 0
@@ -360,7 +360,7 @@ if ((mc.x > w - 90)) {
 }
 
 // add enemy loop
-if (handChargerTicks > Math.floor(Math.random() * (600 - 400) + 400) && (levelFinished == false)) {
+if (handChargerTicks > Math.floor(Math.random() * (500 - 325) + 325) && (levelFinished == false)) {
     handChargerTicks = 0
     addHand()
 }

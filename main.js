@@ -4,8 +4,8 @@ var deathsNumber
 var h = window.innerHeight
 var w = window.innerWidth
 
-var maxSpeed = Math.round(w/205 + h/205)
-var minSpeed = Math.round(w/400 + h/400)
+var maxSpeed = Math.round(w/190 + h/190)
+var minSpeed = Math.round(w/360 + h/360)
 var charSpeed = (maxSpeed + minSpeed) / 30
 console.log(maxSpeed)
 console.log(minSpeed)
