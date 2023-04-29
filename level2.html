@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+
+    <script src="p5.js"></script>
+    <!-- reference external js -->
+    <script src="main.js"></script>
+    <!-- Includes the p5.collide2D addon library -->
+    <script defer src="https://unpkg.com/p5.collide2d"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/addons/p5.sound.js" integrity="sha512-TU9AWtV5uUZPX8dbBAH8NQF1tSdigPRRT82vllAQ1Ke28puiqLA6ZVKxtUGlgrH6yWFnkKy+sE6luNEGH9ar0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.5.0/addons/p5.sound.min.js" integrity="sha512-WzkwpdWEMAY/W8WvP9KS2/VI6zkgejR4/KTxTl4qHx0utqeyVE0JY+S1DlMuxDChC7x0oXtk/ESji6a0lP/Tdg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500&display=swap" rel="stylesheet">
+
+<style>
+body {
+margin: 0;
+overflow: hidden;
+}
+
+#escInfo {
+position: absolute;
+top: 5%;
+left: 11%;
+transform: translate(-50%,-50%);
+
+font-size: 1.25vw;
+font-family: 'Unbounded', cursive;
+
+height: 5vh;
+width: 20vw;
+
+display: flex;
+justify-content: center;
+align-items: center;
+
+border-style: solid;
+border-width: 4.5px;
+border-color: black;
+border-radius: 10px;
+
+background-color: white;
+}
+
+#loadingText {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%,-50%);
+
+visibility: hidden;
+
+font-size: 2vw;
+font-family: 'Unbounded', cursive;
+text-align: center;
+
+height: 10vh;
+width: 25vw;
+
+display: flex;
+justify-content: center;
+align-items: center;
+flex-wrap: nowrap;
+flex-direction: column;
+gap: 5px 5px;
+
+border-style: solid;
+border-width: 4.5px;
+border-color: black;
+border-radius: 10px;
+
+background-color: white;
+}
+
+#finishText {
+position: absolute;
+top: 20%;
+left: 50%;
+transform: translate(-50%,-50%);
+
+visibility: hidden;
+
+font-size: 2vw;
+font-family: 'Unbounded', cursive;
+text-align: center;
+
+height: 35vh;
+width: 35vw;
+
+display: flex;
+justify-content: center;
+align-items: center;
+flex-wrap: nowrap;
+flex-direction: column;
+gap: 80px 80px;
+
+border-style: solid;
+border-width: 4.5px;
+border-color: black;
+border-radius: 10px;
+
+background-color: white;
+}
+
+#restartText {
+position: absolute;
+top: 75%;
+left: 50%;
+transform: translate(-50%,-50%);
+
+visibility: hidden;
+
+font-size: 1.5vw;
+font-family: 'Unbounded', cursive;
+
+height: 10vh;
+width: 25vw;
+
+display: flex;
+justify-content: center;
+align-items: center;
+flex-wrap: nowrap;
+flex-direction: column;
+
+
+background-color: white;
+
+border-style: solid;
+border-width: 4.5px;
+border-color: black;
+border-radius: 10px;
+
+z-index: 3;
+}
+
+#deathInfo {
+position: absolute;
+top: 5%;
+left: 88%;
+transform: translate(-50%,-50%);
+
+font-size: 1.25vw;
+font-family: 'Unbounded', cursive;
+
+height: 5vh;
+width: 20vw;
+
+display: flex;
+justify-content: center;
+align-items: center;
+
+border-style: solid;
+border-width: 4.5px;
+border-color: black;
+border-radius: 10px;
+
+background-color: white;
+}
+
+#introText {
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%,-50%);
+
+visibility: hidden;
+
+font-size: 2vw;
+font-family: 'Unbounded', cursive;
+text-align: center;
+
+height: 35vh;
+width: 35vw;
+
+display: flex;
+justify-content: center;
+align-items: center;
+flex-wrap: nowrap;
+flex-direction: column;
+gap: 80px 80px;
+
+border-style: solid;
+border-width: 4.5px;
+border-color: black;
+border-radius: 10px;
+
+background-color: white;
+}
+
+#introBottomText {
+font-size: 3.5vw;
+color: red;
+}
+</style>
+</head>
+<body>
+
+<div id="escInfo">Press ESC = Start Menu</div>
+<div id="deathInfo">Deaths: <span id="deathNumber">0</span></div>
+
+<div id="introText">
+    <span id="introTopText">The chair's close.</span>
+    <span id="introBottomText">ONE MORE FLOOR.</span>
+</div>
+<div id="loadingText">Loading</div>
+<div id="finishText">
+    <span>They've tired out and have retreated.</span>
+    <span>Continue on to the right. ---></span>
+</div>
+<div id="restartText">
+    <span>You've been killed.</span>
+    <span>Press P to restart the level.</span>
+</div>
+
+<script>
+var h = window.innerHeight
+var w = window.innerWidth
+
+var mc = new mc()
+var hands = new hands()
+var menuHand = new menuHand()
+var menuChair = new menuChair()
+
+var isWPressed = false
+var isSPressed = false
+var isAPressed = false
+var isDPressed = false
+
+var isEscapePressed = false
+
+var deaths = parseInt(sessionStorage.getItem("deaths"))
+var deathEffect
+
+var handCharger
+var handCharger2
+var handCharger3
+var handCharger4
+var cow
+
+var hit
+
+var msTime
+var handChargerTicks = 0
+var levelFinishTicks = 0
+
+var levelMusic
+var levelFinished = false
+var levelStarted = false
+var runnerTrigger = false
+
+var handList = []
+
+window.onload = function() {
+var deathsNumber = deaths
+$("deathNumber").innerHTML = deathsNumber;
+}
+
+function preload() {
+// what are the sound formats
+soundFormats('mp3')
+// bind your sound file to a variable to call it
+levelMusic = loadSound("soundAssets/KMLimpactI.mp3")
+deathEffect = loadSound("soundAssets/splat.mp3")
+
+chair = loadImage('imageAssets/chair.png')
+handCharger = loadImage('imageAssets/fistHand.png')
+handCharger2 = loadImage('imageAssets/handTwo.png')
+handCharger3 = loadImage('imageAssets/handThree.png')
+handCharger4 = loadImage('imageAssets/handFourV2.png')
+cow = loadImage('imageAssets/Test.png')
+}
+
+function setup() {
+createCanvas(w, h)
+levelMusic.setVolume(1.0)
+deathEffect.setVolume(1.0)
+for (var i=0; i<4; i++) {
+    addHand()
+}
+mc.x = 25
+
+menuHand.x = w/2 + 100
+menuChair.x = w/2
+}
+
+function draw() {
+clear()
+
+rectMode(CENTER)
+
+background(125)
+mc.show()
+mc.update()
+
+menuHand.show()
+menuHand.update()
+
+menuChair.show()
+menuChair.update()
+
+/*console.log(handChargerTicks)
+console.log(handList.length)*/
+
+if ((mc.x > 125)) {
+runnerTrigger = true
+}
+
+if ((runnerTrigger == true)) {
+menuHand.xVelocity = 11
+menuChair.xVelocity = 11
+}
+
+// controls WASD
+if ((isWPressed == true)) {
+    mc.upMove()
+}
+if ((isSPressed == true)) {
+    mc.downMove()
+}
+if ((isAPressed == true)) {
+    mc.leftMove()
+}
+if ((isDPressed == true)) {
+    mc.rightMove()
+}
+if ((isEscapePressed == true)) {
+    location.href="index.html"
+    sessionStorage.clear()
+    localStorage.clear()
+}
+
+msTime = Math.round(millis() / 1000)
+if ((menuChair.x > w + 175) && (menuHand.x > w + 175)) {
+    handChargerTicks += 1
+    levelFinishTicks += 1
+    hands.show()
+    hands.update()
+
+    // removes intro text
+    document.getElementById("introText").style.visibility = "hidden";
+
+// music loop
+if ((levelMusic.isPlaying() == false)) {
+            levelMusic.play()
+        }
+
+// finish level
+if (levelFinishTicks > 2300) {
+levelFinished = true
+document.getElementById("finishText").style.visibility = "visible";
+handList.length = 0
+if ((mc.x > w - 90)) {
+        location.href="level3.html"
+        document.getElementById("loadingText").style.visibility = "visible";
+        }
+}
+
+// add enemy loop
+if (handChargerTicks > Math.floor(Math.random() * (600 - 400) + 400) && (levelFinished == false)) {
+    handChargerTicks = 0
+    addHand()
+}
+
+}
+}
+
+// control proccessing
+function keyPressed() {
+if ((key == "w") && (isWPressed == false)) {
+isWPressed = true
+}
+if ((key == "W") && (isWPressed == false)) {
+isWPressed = true
+}
+if ((key == "s") && (isSPressed == false)) {
+isSPressed = true
+}
+if ((key == "S") && (isSPressed == false)) {
+isSPressed = true
+}
+if ((key == "a") && (isAPressed == false)) {
+isAPressed = true
+}
+if ((key == "A") && (isAPressed == false)) {
+isAPressed = true
+}
+if ((key == "d") && (isDPressed == false)) {
+isDPressed = true
+}
+if ((key == "D") && (isDPressed == false)) {
+isDPressed = true
+}
+if ((keyCode == ESCAPE) && (isEscapePressed == false)) {
+isEscapePressed = true
+if ((isLooping() == false) && (levelFinished == false)) {
+location.href="index.html"
+}
+}
+if ((key == "p") && (isLooping() == false) && (levelFinished == false)) {
+document.getElementById("introText").style.visibility = "visible";
+mc.x = w/2
+mc.y = h/2
+mc.xVelocity = 0
+mc.yVelocity = 0
+handChargerTicks = 0
+levelFinishTicks = 0
+handList.length = 0
+for (var i=0; i<4; i++) {
+    addHand()
+}
+msTime = Math.round(millis() / 1000)
+document.getElementById("restartText").style.visibility = "hidden";
+loop()
+}
+
+if ((keyCode == 32)) {
+    if ((levelStarted == false)) {
+    levelStarted = true
+    }
+}
+
+}
+
+function keyReleased() {
+if ((key == "w")) {
+isWPressed = false
+}
+if ((key == "W")) {
+isWPressed = false
+}
+if ((key == "s")) {
+isSPressed = false
+}
+if ((key == "S")) {
+isSPressed = false
+}
+if ((key == "a")) {
+isAPressed = false
+}
+if ((key == "A")) {
+isAPressed = false
+}
+if ((key == "d")) {
+isDPressed = false
+}
+if ((key == "D")) {
+isDPressed = false
+}
+if ((keyCode == ESCAPE)) {
+isEscapePressed = false
+}
+}
+
+function addHand() {
+    handList.push({
+            x: w/2, 
+            y: h/2,
+        
+            width: w/15,
+            height: h/10, 
+        
+            xVelocity: 0,
+            yVelocity: 0,
+        
+            isRepositioning: false,
+            
+            chargeUp: 0,
+            chargeMax: 25,
+        
+            // id should only inform which direction the hand will come from
+            id: Math.floor(Math.random() * 4),
+
+            image: handCharger
+        })
+        // change position and velocity according to id to spawn
+        // top
+        if (handList[handList.length - 1].id == 0) {
+        handList[handList.length - 1].x = Math.floor(Math.random() * ((w - 1) - 1) + 1)
+        handList[handList.length - 1].y = 0
+        handList[handList.length - 1].yVelocity = 5
+        handList[handList.length - 1].image = handCharger
+        }
+        // right
+        if (handList[handList.length - 1].id == 1) {
+        handList[handList.length - 1].y = Math.floor(Math.random() * ((h - 1) - 1) + 1)
+        handList[handList.length - 1].x = w
+        handList[handList.length - 1].xVelocity = -5
+        handList[handList.length - 1].image = handCharger3
+        }
+        // bottom
+        if (handList[handList.length - 1].id == 2) {
+        handList[handList.length - 1].x = Math.floor(Math.random() * ((w - 1) - 1) + 1)
+        handList[handList.length - 1].y = h
+        handList[handList.length - 1].yVelocity = -5
+        handList[handList.length - 1].image = handCharger2
+        }
+        // left
+        if (handList[handList.length - 1].id == 3) {
+        handList[handList.length - 1].y = Math.floor(Math.random() * ((h - 1) - 1) + 1)
+        handList[handList.length - 1].x = 0
+        handList[handList.length - 1].xVelocity = 5
+        handList[handList.length - 1].image = handCharger4
+        }
+    }
+
+
+</script>
+
+</body>
+</html>
